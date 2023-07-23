@@ -56,6 +56,6 @@ if lines == "y":
     for page in file_handle:
         page.insert_image(image_rectangle, filename='lines.png')
 
-    file_handle.save('out1.pdf')
+    file_handle.save('out_lines.pdf')
 
-print("\n\nDone! Saved to out1.pdf")
+print("\n\nDone! Saved to out.pdf and out_lines.pdf")
