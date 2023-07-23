@@ -17,14 +17,23 @@ A4_h = PaperSize.A4.height
 w = round(A4_w)
 h = round(A4_h)
 
+safe = 0
+useSafe = input("Do you want to use the safe area? (y/n): ")
+if useSafe == "y":
+    w = w - 30
+    h = h - 30
+    safe = 15
+
 reader = PdfReader(open(input_file, 'rb'))
 output = [PageObject.create_blank_page(width=A4_w, height=A4_h)]
 
-x = 0
-y = 0
+x = safe
+y = safe
 
 dx = math.ceil(reader.pages[0].mediabox.width)
 dy = math.ceil(reader.pages[0].mediabox.height)
+
+generate_lines(w, h, dx, dy, safe)
 
 for i, page in enumerate(reader.pages):
     progress = (i + 1 / len(reader.pages)) / 100
@@ -34,12 +43,12 @@ for i, page in enumerate(reader.pages):
     output[-1].merge_page(page)
 
     x = x + dx
-    if x + dx >= output[-1].mediabox.width:
+    if x + dx >= output[-1].mediabox.width - safe:
         y = y + dy
-        x = 0
-        if y + dy >= output[-1].mediabox.height:
+        x = safe
+        if y + dy >= output[-1].mediabox.height - safe:
             output.append(PageObject.create_blank_page(width=A4_w, height=A4_h))
-            y = 0
+            y = safe
 
 writer = PdfWriter()
 for page in output:
@@ -49,7 +58,7 @@ with open('out.pdf', 'wb') as f:
     writer.write(f)
 
 if lines == "y":
-    generate_lines(w, h, dx, dy)
+    generate_lines(w, h, dx, dy, safe)
     # define the position (upper-right corner)
     image_rectangle = fitz.Rect(0, 0, w, h)
     file_handle = fitz.open('out.pdf')

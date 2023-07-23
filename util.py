@@ -1,17 +1,19 @@
 from PIL import Image, ImageDraw
 
 
-def generate_lines(w, h, dx, dy):
+def generate_lines(w, h, dx, dy, safe):
     # size of image
     canvas = (w, h)
 
     # rectangles (width, height, left position, top position)
     frames = []
-    for x in range(0, w, dx):
-        frames.append((1, h, x, 0))
-
-    for y in range(h, 0, -dy):
-        frames.append((w, 1, 0, y))
+    for x in range(safe, w, dx):
+        frames.append((1, h, x, safe))
+    print("DY: " + str(dy))
+    print("H: " + str(h))
+    for y in range(h + dx, safe - dy, -dy):
+        print(y)
+        frames.append((w, 1, safe, y))
 
     # init canvas
     img = Image.new('RGBA', canvas, (0, 0, 0, 0))
