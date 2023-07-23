@@ -1,6 +1,8 @@
+import os
+
 from PyPDF2 import PdfReader, PdfWriter, PaperSize, PageObject, Transformation
-import fitz
 import math
+import shutil
 
 from util import generate_lines
 
@@ -10,6 +12,11 @@ print(
     "The PDF should be formatted in a way that the pages are in the correct order, and the pages should be the same size.")
 input_file = input("Enter the path to your file: ")
 lines = input("Do you want the pages to be separated by lines? (y/n): ")
+
+if lines == "y":
+    generate_lines(input_file)
+else:
+    shutil.copyfile(input_file, 'temp.pdf')
 
 A4_w = PaperSize.A4.width
 A4_h = PaperSize.A4.height
@@ -24,16 +31,14 @@ if useSafe == "y":
     h = h - 30
     safe = 15
 
-reader = PdfReader(open(input_file, 'rb'))
+reader = PdfReader(open('temp.pdf', 'rb'))
 output = [PageObject.create_blank_page(width=A4_w, height=A4_h)]
 
 x = safe
 y = safe
 
-dx = math.ceil(reader.pages[0].mediabox.width)
-dy = math.ceil(reader.pages[0].mediabox.height)
-
-generate_lines(w, h, dx, dy, safe)
+dx = round(reader.pages[0].mediabox.width)
+dy = round(reader.pages[0].mediabox.height)
 
 for i, page in enumerate(reader.pages):
     progress = (i + 1 / len(reader.pages)) / 100
@@ -57,14 +62,6 @@ for page in output:
 with open('out.pdf', 'wb') as f:
     writer.write(f)
 
-if lines == "y":
-    generate_lines(w, h, dx, dy, safe)
-    # define the position (upper-right corner)
-    image_rectangle = fitz.Rect(0, 0, w, h)
-    file_handle = fitz.open('out.pdf')
-    for page in file_handle:
-        page.insert_image(image_rectangle, filename='lines.png')
-
-    file_handle.save('out_lines.pdf')
+os.remove("temp.pdf")
 
 print("\n\nDone! Saved to out.pdf and out_lines.pdf")
