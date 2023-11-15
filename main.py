@@ -27,9 +27,9 @@ h = round(A4_h)
 safe = 0
 useSafe = input("Do you want to use the safe area? (y/n): ")
 if useSafe == "y":
-    w = w - 30
-    h = h - 30
-    safe = 15
+    w = w - 60
+    h = h - 60
+    safe = 30
 
 reader = PdfReader(open('temp.pdf', 'rb'))
 output = [PageObject.create_blank_page(width=A4_w, height=A4_h)]
